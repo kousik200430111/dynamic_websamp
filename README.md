@@ -1,1 +1,85 @@
 # dynamic_websamp
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Personal Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+    }
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 0.5rem;
+    }
+    table {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    input, button {
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>My Personal Website</h1>
+
+  <h2>Post a Favorite Link</h2>
+  <form id="linkForm">
+    <input type="url" id="linkInput" placeholder="Enter a link" required />
+    <button type="submit">Post Link</button>
+  </form>
+  <ul id="linkList"></ul>
+
+  <h2>Fetch GitHub Repositories</h2>
+  <button onclick="fetchData()">Load Repositories</button>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>URL</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById('linkForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const link = document.getElementById('linkInput').value;
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+      document.getElementById('linkList').appendChild(listItem);
+      this.reset();
+    });
+
+    function fetchData() {
+      fetch('https://api.github.com/users/octocat/repos')
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector('#dataTable tbody');
+          tableBody.innerHTML = ''; // Clear existing rows
+          data.forEach(repo => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${repo.name}</td>
+              <td><a href="${repo.html_url}" target="_blank">View</a></td>
+              <td>${repo.description || 'No description'}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  </script>
+
+</body>
+</html>
